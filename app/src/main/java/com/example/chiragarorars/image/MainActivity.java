@@ -60,6 +60,10 @@ import com.android.volley.toolbox.Volley;
 //import org.apache.http.entity.InputStreamEntity;
 //import org.apache.http.impl.client.DefaultHttpClient;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -69,6 +73,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 
 public class    MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -88,7 +93,7 @@ public class    MainActivity extends AppCompatActivity implements View.OnClickLi
     private String file = "image";
     private String KEY_NAME = "name";
     String image;
-
+    Bitmap scaledBitmap = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +111,7 @@ public class    MainActivity extends AppCompatActivity implements View.OnClickLi
         bCompress.setOnClickListener(this);
     }
 
-    public String getStringImage(Bitmap bmp) {
+    public String getEncodedImage(Bitmap bmp) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] imageBytes = baos.toByteArray();
@@ -137,18 +142,20 @@ public class    MainActivity extends AppCompatActivity implements View.OnClickLi
                         Toast.makeText(MainActivity.this, volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
                     }
                 }) {
-            @Override
-            public String getBodyContentType() {
-                return "application/x-www-form-urlencoded; charset=\" + getParamsEncoding();";
-            }
+//            @Override
+//            public String getBodyContentType() {
+//                return "application/x-www-form-urlencoded; charset=\" + getParamsEncoding();";
+//            }
 
             @Override
             protected Map getParams() throws AuthFailureError {
 
-                image = getStringImage(bitmap);
-                Map<String, Object> params = new Hashtable<String, Object>();
-                params.put("file", image);
+                image = getEncodedImage(scaledBitmap);
 
+
+                Map<String, String > params = new Hashtable<String, String >();
+                params.put("assets_attributes",image);
+                
                 return params;
             }
         };
@@ -208,7 +215,7 @@ public class    MainActivity extends AppCompatActivity implements View.OnClickLi
 
 
         String file = getRealPathFromURI(filePath);
-        Bitmap scaledBitmap = null;
+
 
         BitmapFactory.Options options = new BitmapFactory.Options();
 
